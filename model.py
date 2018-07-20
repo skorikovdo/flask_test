@@ -23,3 +23,4 @@ class Message (db.Model):
     user = db.relationship('User', backref='message')
     message_text = db.Column(db.String)
     date_time = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    message_answer = db.Column(db.String, nullable=True)
