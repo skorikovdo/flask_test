@@ -46,11 +46,17 @@ def show_user(user_id):
 
 @app.route('/api/followers/create', methods=['POST'])
 def followers_create():
+    """
+    Follow: User X now follows user Y
+    If User X now follows user Y is True -> Unfollow: User X no longer follows user Y
+    """
     from model import User, followers
     if request.method == 'POST':
         form = request.get_json(force=True)
         user = User.query.filter(User.id == form['follower_id']).one()
         foll = User.query.filter(User.id == form['followed_id']).one()
+        if foll in user.followed.all():
+            user.followed.remove(foll)
         user.followed.append(foll)
         db.session.commit()
         return Response(status=200, response='ok')
@@ -73,6 +79,7 @@ def followers_list():
 def show_followers(followers_id):
     from model import User, followers
     if request.method == 'GET':
+        form = request.get_json(force=True)
         return jsonify([{}])
 
 
@@ -87,16 +94,28 @@ def create_message():
     return Response(status=200)
 
 
-@app.route('/api/message/list', methods=['GET'])
-def user_notification():
+@app.route('/api/message/post', methods=['GET', 'POST'])
+def user_post():
+    """
+    Post(X,Y): Post message X as user Y
+    """
     from model import User, Message
-    if request.method == 'GET':
-        pass
+    if request.method == 'GET' or request.method == 'POST':
+        form = request.get_json(force=True)
+        user_post = {}
+        for i in Message.query.all():
+            if form['id'] == i.user.id:
+                return jsonify({ 'message_text': i.message_text,'user_id': i.user.id, 'user': i.user.name})
+    return ('hello')
 
 
+#@app.route('api/message/timeline', methods=['GET', 'POST'])
+#def timeline():
+#    from model import Message
+#    if request.method == 'GET' or request.method == 'POST':
+#        form = request.get_json()
 
 if __name__ == '__main__':
     from model import *
-
     db.create_all ()
     app.run ()
