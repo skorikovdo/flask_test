@@ -21,7 +21,7 @@ def create_user ():
         user = User(name=form['name'])
         db.session.add(user)
         db.session.commit()
-        return Response(status=200)
+        return Response(response='Ok', status=200)
     return Response(status=404)
 
 
@@ -48,6 +48,7 @@ def followers_create():
     """
     Follow: User X now follows user Y
     If User X now follows user Y is True -> Unfollow: User X no longer follows user Y
+    Выводим
     """
     from model import User, followers
     if request.method == 'POST':
@@ -76,14 +77,6 @@ def followers_list():
     return Response(status=404)
 
 
-@app.route('/api/followers/<int:followers_id>', methods=['GET'])
-def show_followers(followers_id):
-    from model import User, followers
-    if request.method == 'GET':
-        form = request.get_json(force=True)
-        return jsonify([{}])
-
-
 @app.route('/api/message/create', methods=['POST'])
 def create_message():
     from model import Message
@@ -105,9 +98,11 @@ def user_post():
         form = request.get_json(force=True)
         id={}
         for i in Message.query.all():
-            if form['id'] == i.user.id:
-                for i in Message.query.filter (Message.user_id == form['id']).order_by (Message.date_time.desc ()).all ():
-                    id[i.id] = {'message_text': i.message_text, 'user_id': i.user.id, 'user': i.user.name}
+            print(i.id, i.user.id)
+            if int(form['id']) == i.user.id:
+                for m in Message.query.filter(Message.user_id == form['id']).order_by(Message.date_time.desc()).all():
+                    id[m.id] = {'message_text': m.message_text, 'user_id': m.user.id, 'user': m.user.name}
+                    print(id)
                 return jsonify(id)
     return Response(status=404)
 
