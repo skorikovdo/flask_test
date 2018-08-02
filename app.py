@@ -88,13 +88,13 @@ def create_message():
     return Response(status=200)
 
 
-@app.route('/api/message/post', methods=['GET', 'POST'])
+@app.route('/api/message/post', methods=['POST'])
 def user_post():
     """
     Post(X,Y): Post message X as user Y
     """
     from model import User, Message
-    if request.method == 'GET' or request.method == 'POST':
+    if request.method == 'POST':
         form = request.get_json(force=True)
         id={}
         for i in Message.query.all():
@@ -109,27 +109,22 @@ def user_post():
 
 
 
-@app.route('/api/message/timeline', methods=['GET', 'POST'])
+@app.route('/api/message/timeline', methods=['POST'])
 def timeline():
     from model import Message
-    if request.method == 'GET' or request.method == 'POST':
+    if request.method == 'POST':
         form = request.get_json(force=True)
         user = User.query.filter(User.id == form['id']).one()
         id = {}
-        sort = []
         n = 1
-        for i in user.followed.all():
-            for i in Message.query.filter(i == Message.user).all():
-                sort.append(i)
-            while n < len(sort):
-                for q in range(len(sort)-1):
-                    if sort[q].id < sort[q + 1].id:
-                        sort[q], sort[q + 1] = sort[q + 1], sort[q]
-                n+=1
-        n = 0
-        for i in sort:
-            id[n] = {'message': i.id,'autor_id': i.user.id, 'autor_name': i.user.name, 'message_text': i.message_text, 'time': i.date_time.strftime ('%d %m %Y %H:%M:%S')}
-            n+=1
+        id = {}
+        for i in user.followed.all ():
+            message_timeline = db.session.query (User.name, Message.message_text, Message.date_time).filter (
+                User.id == Message.user_id, User.id == i.id).order_by (
+                Message.date_time.desc ()).one ()
+            if message_timeline:
+                id[user.name + str(n)] = {'user_name': message_timeline[0], 'message': message_timeline[1], 'datetime': message_timeline[2]}
+                n += 1
         return jsonify(id)
     return Response(status=404)
 
