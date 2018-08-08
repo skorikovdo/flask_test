@@ -36,8 +36,6 @@ class TestCase(unittest.TestCase):
 
         self.app.post('/api/message/create', data=json.dumps({"user_id": 1, "message_text": "Hello, I am user 1"}))
         self.app.post('/api/message/create', data=json.dumps({"user_id": 2, "message_text": "Hello, I am user 2"}))
-        for i in range(1, 100000000):
-            pass
         self.app.post('/api/message/create', data=json.dumps({"user_id": 3, "message_text": "Hello, I am user 3"}))
 
         message_post = self.app.post('/api/message/post', data=json.dumps({"id": 1}))
