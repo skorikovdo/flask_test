@@ -118,10 +118,12 @@ def message_list():
         form = request.get_json(force=True)
         user = User.query.filter(User.id == form['id']).one()
         message_id = {}
-        followed_id_list = [i.id for i in user.followed.all()]
-        for i in db.session.query(Message.date_time, User.name, Message.message_text, User, Message.id).join(User) \
+        followed_id_list = [followed.id for followed in user.followed.all()]
+        for followed_message in db.session.query(Message.date_time, User.name, Message.message_text, User, Message.id).join(User) \
                 .filter(User.id.in_(followed_id_list)).order_by(Message.date_time.desc()).all():
-            message_id[i.id] = dict(message_date_time=i.date_time, message_text=i.message_text, autor_id=i.name)
+            message_id[followed_message.id] = dict(message_date_time=followed_message.date_time,
+                                                   message_text=followed_message.message_text,
+                                                   autor_id=followed_message.name)
         return jsonify(message_id)
     return Response(status=404)
 

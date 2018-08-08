@@ -16,6 +16,10 @@ class User (db.Model):
                                 backref=db.backref('followers', lazy='dynamic'),
                                 lazy='dynamic')
 
+    #def add_user(self):
+    #    db.session.add(self)
+    #    db.session.commit()
+
 
 class Message (db.Model):
     id = db.Column(db.Integer, primary_key=True)
