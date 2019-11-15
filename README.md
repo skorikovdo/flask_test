@@ -46,8 +46,6 @@ Python is preferred, but other programming language are allowed (although
 
 # Solution
 
-В рамках тестовой задачи реализованы API:
-
 ```
 
 POST /api/user/create - завести пользоваталя, передаем параметр 'name',
